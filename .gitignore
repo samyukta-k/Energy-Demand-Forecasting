@@ -1,0 +1,13 @@
+venv/
+.env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.vscode/
+.DS_Store
+outputs/
+*.log
+*.tmp
+.env
+household_power_consumption.txt
