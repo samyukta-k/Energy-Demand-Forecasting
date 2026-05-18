@@ -37,7 +37,7 @@ Workflow:
 
 Installation:
 1. Clone the Repository: 
-git clone https://github.com/your-username/smart-energy-forecasting.git
+git clone https://github.com/samyukta-k/Energy-Demand-Forecasting.git
 cd smart-energy-forecasting
 
 2. Create Virtual Environment:
