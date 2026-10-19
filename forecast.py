@@ -198,8 +198,10 @@ def run_forecast_pipeline(
 
     return forecast_df
 
+
 if __name__ == "__main__":
     import sys
+
     from preprocess import run_pipeline
     from xgboost_model import run_xgboost_pipeline
     from statistical_models import (
@@ -207,54 +209,26 @@ if __name__ == "__main__":
         run_arima,
         run_sarimax,
         compare_models,
-)
+    )
 
     data_path = (
-        sys.argv[1] if len(sys.argv) > 1 else "household_power_consumption.txt"
+        sys.argv[1]
+        if len(sys.argv) > 1
+        else "household_power_consumption.txt"
     )
 
     df_processed = run_pipeline(data_path)
+    train_df, test_df = chronological_split(df_processed)
+    xgb_results = run_xgboost_pipeline(df_processed)
+    arima_results = run_arima(train_df, test_df)
+    sarimax_results = run_sarimax(train_df, test_df)
 
-train_df, test_df = chronological_split(df_processed)
-
-xgb_results = run_xgboost_pipeline(df_processed)
-
-arima_results = run_arima(train_df, test_df)
-
-sarimax_results = run_sarimax(train_df, test_df)
-
-comparison, best_model = compare_models(
-    arima_results["metrics"],
-    sarimax_results["metrics"],
-    xgb_results["metrics"],
-)
-
-if best_model == "XGBoost":
-
-    selected_model = xgb_results["model"]
-
-    forecast = run_forecast_pipeline(
-        selected_model,
-        df_processed,
-        model_type="xgboost",
+    comparison, best_model = compare_models(
+        arima_results["metrics"],
+        sarimax_results["metrics"],
+        xgb_results["metrics"],
     )
 
-elif best_model == "SARIMAX":
+    comparison.to_csv("model_comparison_results.csv", index=False)
 
-    selected_model = sarimax_results["model"]
-
-    forecast = run_forecast_pipeline(
-        selected_model,
-        df_processed,
-        model_type="sarimax",
-    )
-
-else:
-
-    selected_model = arima_results["model"]
-
-    forecast = run_forecast_pipeline(
-        selected_model,
-        df_processed,
-        model_type="arima",
-    )
+    print("\nResults saved to model_comparison_results.csv")
